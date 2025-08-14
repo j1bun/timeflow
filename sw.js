@@ -1,10 +1,10 @@
 const CACHE = 'timeflow-v1';
 const CORE = [
-	'/',
-	'/index.html',
-	'/styles.css',
-	'/app.js',
-	'/manifest.webmanifest'
+	'./',
+	'./index.html',
+	'./styles.css',
+	'./app.js',
+	'./manifest.webmanifest'
 ];
 
 self.addEventListener('install', (event) => {
@@ -35,7 +35,7 @@ self.addEventListener('fetch', (event) => {
 			cache.put(req, res.clone());
 			return res;
 		} catch (err) {
-			const fallback = await caches.match('/index.html');
+			const fallback = await caches.match('./index.html');
 			return fallback || new Response('Offline', { status: 503, statusText: 'Offline' });
 		}
 	})());
