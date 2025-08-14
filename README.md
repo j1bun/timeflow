@@ -1,4 +1,4 @@
-# Timeflow Stopwatch
+# PWA: The Time Flow
 
 A minimal PWA stopwatch with label input. Works offline.
 
@@ -17,5 +17,5 @@ Then open:
 Add to Home Screen to use as a PWA. 
 
 <p align="center">
-  <img src="./_readme/stopwatch_v3_PC.png" />
+  <img src="./_readme/timeflow.png" />
 </p>

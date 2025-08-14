@@ -154,9 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		row.setAttribute('data-row', t.id);
 		row.draggable = true;
 
-		const dragHandle = document.createElement('div');
-		dragHandle.className = 'drag-handle';
-
 		const timeEl = document.createElement('div');
 		timeEl.className = 'time';
 		timeEl.textContent = formatHMS(effectiveElapsedMs(t));
@@ -248,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			draggedElement = null;
 		});
 
-		row.appendChild(dragHandle);
 		row.appendChild(timeEl);
 		row.appendChild(inputEl);
 		row.appendChild(actions);
