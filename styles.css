@@ -36,14 +36,45 @@ body {
 	border-radius: 12px;
 	padding: 10px;
 	display: grid;
-	grid-template-columns: 180px 1fr auto auto;
+	grid-template-columns: auto 180px 1fr auto auto;
 	gap: 10px;
 	align-items: center;
+	cursor: grab;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.row:active { cursor: grabbing; }
+
+.row.dragging {
+	opacity: 0.5;
+	transform: rotate(2deg);
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.drag-handle {
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--muted);
+	cursor: grab;
+	user-select: none;
+}
+
+.drag-handle:active { cursor: grabbing; }
+
+.drag-handle::before {
+	content: "⋮⋮";
+	font-size: 12px;
+	line-height: 1;
+	letter-spacing: -2px;
 }
 
 @media (max-width: 560px) {
 	.row { grid-template-columns: 1fr; align-items: stretch; }
 	.row .actions { justify-content: flex-end; }
+	.drag-handle { justify-self: center; }
 }
 
 .time {

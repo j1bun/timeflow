@@ -30,6 +30,7 @@ function saveTimers(timers) {
 }
 
 let timers = loadTimers();
+let draggedElement = null;
 
 function formatHMS(totalMs) {
 	const totalSeconds = Math.floor(totalMs / 1000);
@@ -90,8 +91,17 @@ function renameTimer(id, title) {
 	saveTimers(timers);
 }
 
+function reorderTimers(fromIndex, toIndex) {
+	if (fromIndex === toIndex) return;
+	const [moved] = timers.splice(fromIndex, 1);
+	timers.splice(toIndex, 0, moved);
+	saveTimers(timers);
+	render();
+}
+
 function render() {
 	listEl.innerHTML = '';
+	
 	for (const t of timers) {
 		listEl.appendChild(createRow(t));
 	}
@@ -110,6 +120,10 @@ function createRow(t) {
 	const row = document.createElement('div');
 	row.className = 'row';
 	row.setAttribute('data-row', t.id);
+	row.draggable = true;
+
+	const dragHandle = document.createElement('div');
+	dragHandle.className = 'drag-handle';
 
 	const timeEl = document.createElement('div');
 	timeEl.className = 'time';
@@ -138,6 +152,61 @@ function createRow(t) {
 	actions.appendChild(toggleBtn);
 	actions.appendChild(delBtn);
 
+	// Drag events
+	row.addEventListener('dragstart', (e) => {
+		draggedElement = row;
+		row.classList.add('dragging');
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text/html', row.outerHTML);
+	});
+
+	row.addEventListener('dragend', () => {
+		row.classList.remove('dragging');
+		draggedElement = null;
+	});
+
+	row.addEventListener('dragenter', (e) => {
+		e.preventDefault();
+		if (draggedElement && draggedElement !== row) {
+			row.style.borderColor = 'var(--primary)';
+			row.style.backgroundColor = 'color-mix(in oklab, var(--panel), var(--primary) 10%)';
+		}
+	});
+
+	row.addEventListener('dragleave', (e) => {
+		// Only remove highlight if we're leaving the row entirely
+		if (!row.contains(e.relatedTarget)) {
+			row.style.borderColor = '';
+			row.style.backgroundColor = '';
+		}
+	});
+
+	row.addEventListener('dragover', (e) => {
+		e.preventDefault();
+		e.dataTransfer.dropEffect = 'move';
+	});
+
+	row.addEventListener('drop', (e) => {
+		e.preventDefault();
+		row.style.borderColor = '';
+		row.style.backgroundColor = '';
+		
+		if (!draggedElement || draggedElement === row) return;
+		
+		const draggedId = draggedElement.getAttribute('data-row');
+		const targetId = row.getAttribute('data-row');
+		
+		const draggedIndex = timers.findIndex(t => t.id === draggedId);
+		const targetIndex = timers.findIndex(t => t.id === targetId);
+		
+		if (draggedIndex !== -1 && targetIndex !== -1) {
+			reorderTimers(draggedIndex, targetIndex);
+		}
+		
+		draggedElement = null;
+	});
+
+	row.appendChild(dragHandle);
 	row.appendChild(timeEl);
 	row.appendChild(inputEl);
 	row.appendChild(actions);
