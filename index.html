@@ -12,18 +12,11 @@
 </head>
 <body>
 	<main class="container">
-		<header class="topbar">
-			<div class="time" id="timeDisplay" aria-live="polite" aria-atomic="true">00:00:00</div>
-			<div class="actions">
-				<button id="startPauseBtn" class="btn primary" aria-pressed="false">Start</button>
-				<button id="resetBtn" class="btn danger" aria-label="Delete and reset">Delete</button>
-			</div>
-		</header>
+		<div class="toolbar">
+			<button id="addBtn" class="btn primary">Add Section</button>
+		</div>
 
-		<section class="label-row">
-			<label for="labelInput" class="label">Label</label>
-			<input id="labelInput" class="text" type="text" placeholder="My stopwatch..." autocomplete="off" spellcheck="false">
-		</section>
+		<section id="list" class="list" aria-live="polite"></section>
 	</main>
 
 	<script src="/app.js" type="module"></script>
