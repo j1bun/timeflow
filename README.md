@@ -7,7 +7,6 @@ A minimal PWA stopwatch with label input. Works offline.
 Any static server will do. Example with Python:
 
 ```bash
-cd /home/ames0k0/Desktop/projects/gh/j1bun/timeflow
 python3 -m http.server 5173
 ```
 
