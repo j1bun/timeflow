@@ -113,7 +113,8 @@ function renderRow(id) {
 	const row = document.querySelector(`[data-row="${id}"]`);
 	if (!row) return;
 	row.querySelector('.time').textContent = formatHMS(effectiveElapsedMs(t));
-	row.querySelector('.toggle').textContent = t.running ? 'Pause' : 'Start';
+	row.querySelector('.toggle').innerHTML = t.running ? '⏸' : '▶';
+	row.querySelector('.toggle').setAttribute('aria-label', t.running ? 'Pause' : 'Start');
 }
 
 function createRow(t) {
@@ -141,12 +142,14 @@ function createRow(t) {
 
 	const toggleBtn = document.createElement('button');
 	toggleBtn.className = 'btn primary toggle';
-	toggleBtn.textContent = t.running ? 'Pause' : 'Start';
+	toggleBtn.innerHTML = t.running ? '⏸' : '▶';
+	toggleBtn.setAttribute('aria-label', t.running ? 'Pause' : 'Start');
 	toggleBtn.addEventListener('click', () => toggleTimer(t.id));
 
 	const delBtn = document.createElement('button');
 	delBtn.className = 'btn danger';
-	delBtn.textContent = 'Delete';
+	delBtn.innerHTML = '🗑';
+	delBtn.setAttribute('aria-label', 'Delete');
 	delBtn.addEventListener('click', () => deleteTimer(t.id));
 
 	actions.appendChild(toggleBtn);

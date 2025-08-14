@@ -108,6 +108,12 @@ body {
 	border-radius: 8px;
 	cursor: pointer;
 	font-weight: 600;
+	font-size: 16px;
+	line-height: 1;
+	min-width: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .btn.primary { border-color: color-mix(in oklab, var(--primary), #000 60%); background: color-mix(in oklab, var(--primary), #000 85%); }
