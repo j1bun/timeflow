@@ -108,12 +108,33 @@ body {
 	border-radius: 8px;
 	cursor: pointer;
 	font-weight: 600;
+	font-size: 16px;
+	line-height: 1;
+	min-width: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
 }
 
 .btn.primary { border-color: color-mix(in oklab, var(--primary), #000 60%); background: color-mix(in oklab, var(--primary), #000 85%); }
 .btn.primary:active { transform: translateY(1px); }
 
 .btn.danger { border-color: color-mix(in oklab, var(--danger), #000 60%); background: color-mix(in oklab, var(--danger), #000 85%); }
+
+/* Mobile touch improvements */
+@media (hover: none) and (pointer: coarse) {
+	.btn {
+		min-height: 44px;
+		padding: 12px 16px;
+	}
+	
+	.input {
+		min-height: 44px;
+		font-size: 16px; /* Prevents zoom on iOS */
+	}
+}
 
 .label-row {
 	margin-top: 14px;

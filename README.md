@@ -18,5 +18,5 @@ Then open:
 Add to Home Screen to use as a PWA. 
 
 <p align="center">
-  <img src="./_readme/stopwatch_v2.png" />
+  <img src="./_readme/stopwatch_v3_PC.png" />
 </p>
