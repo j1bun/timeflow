@@ -1,11 +1,11 @@
 {
-	"name": "Timeflow Stopwatch",
-	"short_name": "Timeflow",
+	"name": "TheTimeFlow",
+	"short_name": "TimeFlow",
 	"start_url": "./index.html",
 	"display": "standalone",
 	"background_color": "#0b1020",
 	"theme_color": "#0ea5e9",
-	"description": "Simple offline-first stopwatch with label.",
+	"description": "Simple offline-first stopwatches with a names.",
 	"icons": [
 		{ "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
 		{ "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png" }

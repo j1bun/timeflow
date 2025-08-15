@@ -1,6 +1,6 @@
 # PWA: The Time Flow
 
-A minimal PWA, stopwatches with a name.
+Simple offline-first stopwatches with a names.
 
 ## Run locally
 
