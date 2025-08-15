@@ -1,17 +1,17 @@
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM loaded, initializing app...');
-	
+
 	const listEl = document.getElementById('list');
 	const addBtn = document.getElementById('addBtn');
-	
+
 	console.log('Elements found:', { listEl: !!listEl, addBtn: !!addBtn });
-	
+
 	if (!addBtn) {
 		console.error('Add button not found!');
 		return;
 	}
-	
+
 	if (!listEl) {
 		console.error('List element not found!');
 		return;
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function render() {
 		listEl.innerHTML = '';
-		
+
 		for (const t of timers) {
 			listEl.appendChild(createRow(t));
 		}
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const inputEl = document.createElement('input');
 		inputEl.className = 'input';
 		inputEl.type = 'text';
-		inputEl.placeholder = 'Section...';
+		inputEl.placeholder = 'Name...';
 		inputEl.value = t.title;
 		inputEl.addEventListener('input', (e) => renameTimer(t.id, e.target.value));
 
@@ -229,19 +229,19 @@ document.addEventListener('DOMContentLoaded', () => {
 			e.preventDefault();
 			row.style.borderColor = '';
 			row.style.backgroundColor = '';
-			
+
 			if (!draggedElement || draggedElement === row) return;
-			
+
 			const draggedId = draggedElement.getAttribute('data-row');
 			const targetId = row.getAttribute('data-row');
-			
+
 			const draggedIndex = timers.findIndex(t => t.id === draggedId);
 			const targetIndex = timers.findIndex(t => t.id === targetId);
-			
+
 			if (draggedIndex !== -1 && targetIndex !== -1) {
 				reorderTimers(draggedIndex, targetIndex);
 			}
-			
+
 			draggedElement = null;
 		});
 
@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		e.preventDefault();
 		addTimer();
 	});
-	
+
 	addBtn.addEventListener('touchend', (e) => {
 		console.log('Add button touched!');
 		e.preventDefault();

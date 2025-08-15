@@ -1,6 +1,6 @@
 # PWA: The Time Flow
 
-A minimal PWA stopwatch with label input. Works offline.
+A minimal PWA, stopwatches with a name.
 
 ## Run locally
 
