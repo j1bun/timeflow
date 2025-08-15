@@ -1,14 +1,20 @@
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM loaded, initializing app...');
-	
+
 	const listEl = document.getElementById('list');
 	const addBtn = document.getElementById('addBtn');
-	
-	console.log('Elements found:', { listEl: !!listEl, addBtn: !!addBtn });
-	
+	const summarizeBtn = document.getElementById('summarizeBtn');
+
+	console.log('Elements found:', { listEl: !!listEl, addBtn: !!addBtn, summarizeBtn: !!summarizeBtn });
+
 	if (!addBtn) {
 		console.error('Add button not found!');
+		return;
+	}
+
+	if (!summarizeBtn) {
+		console.error('Summarize button not found!');
 		return;
 	}
 	
@@ -33,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	/** Timer type
-	 * { id: string, title: string, running: boolean, startEpochMs: number|null, elapsedMs: number }
+	 * { id: string, title: string, started: boolean, startEpochMs: number|null, elapsedMs: number, isSummary: boolean }
 	 */
 
 	function loadTimers() {
@@ -45,9 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			return arr.map((t) => ({
 				id: String(t.id || generateId()),
 				title: typeof t.title === 'string' ? t.title : '',
-				running: !!t.running,
+				started: !!t.started,
 				startEpochMs: typeof t.startEpochMs === 'number' ? t.startEpochMs : null,
-				elapsedMs: typeof t.elapsedMs === 'number' ? t.elapsedMs : 0
+				elapsedMs: typeof t.elapsedMs === 'number' ? t.elapsedMs : 0,
+				isSummary: !!t.isSummary
 			}));
 		} catch (_) {
 			return [];
@@ -73,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function nowMs() { return Date.now(); }
 
 	function effectiveElapsedMs(timer) {
-		if (!timer.running || !timer.startEpochMs) return timer.elapsedMs;
+		if (!timer.started || !timer.startEpochMs) return timer.elapsedMs;
 		return timer.elapsedMs + (nowMs() - timer.startEpochMs);
 	}
 
@@ -82,9 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		const t = {
 			id: generateId(),
 			title: '',
-			running: false,
+			started: false,
 			startEpochMs: null,
-			elapsedMs: 0
+			elapsedMs: 0,
+			isSummary: false
 		};
 		timers.unshift(t);
 		saveTimers(timers);
@@ -92,17 +100,47 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log('Timer added, total timers:', timers.length);
 	}
 
+	function addSummary() {
+		console.log('Adding summary...');
+		
+		// Calculate total time from ALL stopwatches (started and paused)
+		let totalMs = 0;
+		const allTimers = timers.filter(t => !t.isSummary);
+		const startedTimers = allTimers.filter(t => t.started);
+		const pausedTimers = allTimers.filter(t => !t.started);
+		
+		// Sum time from all stopwatches (both started and paused)
+		for (const timer of allTimers) {
+			totalMs += effectiveElapsedMs(timer);
+		}
+		
+		// Create summary timer with detailed counts
+		const summaryTimer = {
+			id: generateId(),
+			title: `Count: ${allTimers.length}, Started: ${startedTimers.length}, Paused: ${pausedTimers.length}`,
+			started: false,
+			startEpochMs: null,
+			elapsedMs: totalMs,
+			isSummary: true
+		};
+		
+		timers.unshift(summaryTimer);
+		saveTimers(timers);
+		render();
+		console.log('Summary added, total time:', formatHMS(totalMs), 'Counts:', { total: allTimers.length, started: startedTimers.length, paused: pausedTimers.length });
+	}
+
 	function toggleTimer(id) {
 		const t = timers.find((x) => x.id === id);
-		if (!t) return;
-		if (t.running) {
+		if (!t || t.isSummary) return; // Don't allow toggling summary timers
+		if (t.started) {
 			// pause
 			t.elapsedMs = effectiveElapsedMs(t);
-			t.running = false;
+			t.started = false;
 			t.startEpochMs = null;
 		} else {
 			// start
-			t.running = true;
+			t.started = true;
 			t.startEpochMs = nowMs();
 		}
 		saveTimers(timers);
@@ -144,8 +182,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		const row = document.querySelector(`[data-row="${id}"]`);
 		if (!row) return;
 		row.querySelector('.time').textContent = formatHMS(effectiveElapsedMs(t));
-		row.querySelector('.toggle').innerHTML = t.running ? '⏸' : '▶';
-		row.querySelector('.toggle').setAttribute('aria-label', t.running ? 'Pause' : 'Start');
+		if (!t.isSummary) {
+			row.querySelector('.toggle').innerHTML = t.started ? '⏸' : '▶';
+			row.querySelector('.toggle').setAttribute('aria-label', t.started ? 'Pause' : 'Start');
+		}
 	}
 
 	function createRow(t) {
@@ -153,6 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		row.className = 'row';
 		row.setAttribute('data-row', t.id);
 		row.draggable = true;
+		
+		if (t.isSummary) {
+			row.classList.add('summary-row');
+		}
 
 		const timeEl = document.createElement('div');
 		timeEl.className = 'time';
@@ -161,22 +205,26 @@ document.addEventListener('DOMContentLoaded', () => {
 		const inputEl = document.createElement('input');
 		inputEl.className = 'input';
 		inputEl.type = 'text';
-		inputEl.placeholder = 'Section...';
+		inputEl.placeholder = 'Name...';
 		inputEl.value = t.title;
 		inputEl.addEventListener('input', (e) => renameTimer(t.id, e.target.value));
 
 		const actions = document.createElement('div');
 		actions.className = 'actions';
 
-		const toggleBtn = document.createElement('button');
-		toggleBtn.className = 'btn primary toggle';
-		toggleBtn.innerHTML = t.running ? '⏸' : '▶';
-		toggleBtn.setAttribute('aria-label', t.running ? 'Pause' : 'Start');
-		toggleBtn.addEventListener('click', () => toggleTimer(t.id));
-		toggleBtn.addEventListener('touchend', (e) => {
-			e.preventDefault();
-			toggleTimer(t.id);
-		});
+		// Only show toggle button for non-summary timers
+		if (!t.isSummary) {
+			const toggleBtn = document.createElement('button');
+			toggleBtn.className = 'btn primary toggle';
+			toggleBtn.innerHTML = t.started ? '⏸' : '▶';
+			toggleBtn.setAttribute('aria-label', t.started ? 'Pause' : 'Start');
+			toggleBtn.addEventListener('click', () => toggleTimer(t.id));
+			toggleBtn.addEventListener('touchend', (e) => {
+				e.preventDefault();
+				toggleTimer(t.id);
+			});
+			actions.appendChild(toggleBtn);
+		}
 
 		const delBtn = document.createElement('button');
 		delBtn.className = 'btn danger';
@@ -188,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			deleteTimer(t.id);
 		});
 
-		actions.appendChild(toggleBtn);
 		actions.appendChild(delBtn);
 
 		// Drag events
@@ -229,19 +276,19 @@ document.addEventListener('DOMContentLoaded', () => {
 			e.preventDefault();
 			row.style.borderColor = '';
 			row.style.backgroundColor = '';
-			
+
 			if (!draggedElement || draggedElement === row) return;
-			
+
 			const draggedId = draggedElement.getAttribute('data-row');
 			const targetId = row.getAttribute('data-row');
-			
+
 			const draggedIndex = timers.findIndex(t => t.id === draggedId);
 			const targetIndex = timers.findIndex(t => t.id === targetId);
-			
+
 			if (draggedIndex !== -1 && targetIndex !== -1) {
 				reorderTimers(draggedIndex, targetIndex);
 			}
-			
+
 			draggedElement = null;
 		});
 
@@ -258,18 +305,30 @@ document.addEventListener('DOMContentLoaded', () => {
 		e.preventDefault();
 		addTimer();
 	});
-	
+
 	addBtn.addEventListener('touchend', (e) => {
 		console.log('Add button touched!');
 		e.preventDefault();
 		addTimer();
 	});
 
+	summarizeBtn.addEventListener('click', (e) => {
+		console.log('Summarize button clicked!');
+		e.preventDefault();
+		addSummary();
+	});
+
+	summarizeBtn.addEventListener('touchend', (e) => {
+		console.log('Summarize button touched!');
+		e.preventDefault();
+		addSummary();
+	});
+
 	// animation frame update
 	let rafId = 0;
 	function loop() {
 		for (const t of timers) {
-			if (!t.running) continue;
+			if (!t.started) continue;
 			const row = document.querySelector(`[data-row="${t.id}"]`);
 			if (row) row.querySelector('.time').textContent = formatHMS(effectiveElapsedMs(t));
 		}
