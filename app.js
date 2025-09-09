@@ -188,6 +188,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	function getCurrentDateTime() {
+		var currentDate = new Date();
+		// Define the format of the output string
+		var formatter = Intl.DateTimeFormat('en-US', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			hour: 'numeric',
+			minute: 'numeric',
+			second: 'numeric'
+		});
+		return formatter.format(currentDate);
+	}
+
 	function createRow(t) {
 		const row = document.createElement('div');
 		row.className = 'row';
@@ -205,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const inputEl = document.createElement('input');
 		inputEl.className = 'input';
 		inputEl.type = 'text';
-		inputEl.placeholder = 'Name...';
+		inputEl.placeholder = getCurrentDateTime();
 		inputEl.value = t.title;
 		inputEl.addEventListener('input', (e) => renameTimer(t.id, e.target.value));
 
