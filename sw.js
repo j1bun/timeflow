@@ -1,4 +1,4 @@
-const CACHE = 'timeflow-v1.5.1';
+const CACHE = 'timeflow-v1.5.2';
 const CORE = [
 	'./',
 	'./index.html',
