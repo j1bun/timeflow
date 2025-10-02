@@ -240,17 +240,51 @@ document.addEventListener('DOMContentLoaded', () => {
 			actions.appendChild(toggleBtn);
 		}
 
+
+		// Confirmation state for delete
+		let confirmDelete = false;
 		const delBtn = document.createElement('button');
 		delBtn.className = 'btn danger';
 		delBtn.innerHTML = '🗑';
 		delBtn.setAttribute('aria-label', 'Delete');
-		delBtn.addEventListener('click', () => deleteTimer(t.id));
+
+		// Container for confirmation buttons
+		const confirmContainer = document.createElement('span');
+		confirmContainer.style.display = 'inline-block';
+		confirmContainer.style.marginLeft = '8px';
+
+		function showConfirm() {
+			confirmContainer.innerHTML = '';
+			const yesBtn = document.createElement('button');
+			yesBtn.textContent = 'Y';
+			yesBtn.className = 'btn confirm-yes';
+			yesBtn.style.marginRight = '4px';
+			yesBtn.addEventListener('click', () => {
+				deleteTimer(t.id);
+			});
+			const noBtn = document.createElement('button');
+			noBtn.textContent = 'N';
+			noBtn.className = 'btn confirm-no';
+			noBtn.addEventListener('click', () => {
+				confirmContainer.innerHTML = '';
+				delBtn.style.display = '';
+			});
+			confirmContainer.appendChild(yesBtn);
+			confirmContainer.appendChild(noBtn);
+			delBtn.style.display = 'none';
+		}
+
+		delBtn.addEventListener('click', (e) => {
+			e.preventDefault();
+			showConfirm();
+		});
 		delBtn.addEventListener('touchend', (e) => {
 			e.preventDefault();
-			deleteTimer(t.id);
+			showConfirm();
 		});
 
 		actions.appendChild(delBtn);
+		actions.appendChild(confirmContainer);
 
 		// Drag events
 		row.addEventListener('dragstart', (e) => {
